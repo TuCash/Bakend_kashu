@@ -33,10 +33,11 @@ build/
 .vscode/
 
 ### Application Properties ###
+# Solo ignorar archivos con credenciales locales específicas
 application-local.properties
 application-dev.properties
 application-prod.properties
-application.properties
+# application.properties ahora usa variables de entorno, es seguro subirlo
 
 ### Logs ###
 *.log
@@ -52,19 +53,9 @@ mvnw
 mvnw.cmd
 
 ### Documentation Files ###
-AGENTS.md
-API-ENDPOINTS.md
-CLAUDE.md
-HEROKU-DEPLOY.md
-IMPLEMENTATION-SUMMARY.md
-KASHU.md
-kashu2.0.md
-KASHU-ES.md
-KASHU-INTEGRATION-NOTES.md
 tree.txt
 
 ### Git Configuration ###
-.claude
 .gitattributes
 
 DOCUMENTACION-COMPLETA.md
