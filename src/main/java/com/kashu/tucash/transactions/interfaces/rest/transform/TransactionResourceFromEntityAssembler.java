@@ -5,6 +5,7 @@ import com.kashu.tucash.transactions.interfaces.rest.resources.TransactionResour
 
 public class TransactionResourceFromEntityAssembler {
     public static TransactionResource toResourceFromEntity(Transaction entity) {
+        var linkedGoal = entity.getLinkedGoal();
         return new TransactionResource(
                 entity.getId(),
                 entity.getAccount().getId(),
@@ -16,6 +17,8 @@ public class TransactionResourceFromEntityAssembler {
                 entity.getAmount(),
                 entity.getDescription(),
                 entity.getTransactionDate(),
+                linkedGoal != null ? linkedGoal.getId() : null,
+                linkedGoal != null ? linkedGoal.getName() : null,
                 entity.getCreatedAt()
         );
     }

@@ -15,6 +15,8 @@ public record TransactionResource(
         BigDecimal amount,
         String description,
         LocalDate transactionDate,
+        Long goalId,
+        String goalName,
         Date createdAt
 ) {
 }

@@ -74,6 +74,18 @@ public class Goal extends AuditableAbstractAggregateRoot<Goal> {
         checkIfCompleted();
     }
 
+    public void subtractProgress(BigDecimal amount) {
+        this.currentAmount = this.currentAmount.subtract(amount);
+        if (this.currentAmount.compareTo(BigDecimal.ZERO) < 0) {
+            this.currentAmount = BigDecimal.ZERO;
+        }
+        // Si estaba completada y ahora no, volver a activa
+        if (this.status == GoalStatus.COMPLETED && this.currentAmount.compareTo(this.targetAmount) < 0) {
+            this.status = GoalStatus.ACTIVE;
+            this.celebratedAt = null;
+        }
+    }
+
     public void updateProgress(UpdateGoalProgressCommand command) {
         this.currentAmount = command.currentAmount();
         checkIfCompleted();

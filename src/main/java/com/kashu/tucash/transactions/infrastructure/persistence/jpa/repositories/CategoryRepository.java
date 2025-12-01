@@ -20,4 +20,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // Categorías del sistema
     List<Category> findByUserIsNullAndType(CategoryType type);
+
+    // Buscar categoría por nombre (para categoría de ahorro)
+    java.util.Optional<Category> findByNameAndUserIsNull(String name);
 }

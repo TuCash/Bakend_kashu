@@ -6,6 +6,8 @@ import com.kashu.tucash.savings.domain.services.*;
 import com.kashu.tucash.savings.interfaces.rest.resources.*;
 import com.kashu.tucash.savings.interfaces.rest.transform.*;
 import com.kashu.tucash.shared.infrastructure.security.AuthenticationHelper;
+import com.kashu.tucash.transactions.interfaces.rest.resources.TransactionResource;
+import com.kashu.tucash.transactions.interfaces.rest.transform.TransactionResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -114,5 +116,68 @@ public class GoalsController {
         var command = new DeleteGoalCommand(id);
         goalCommandService.handle(command);
         return ResponseEntity.noContent().build();
+    }
+
+    // ==================== CONTRIBUCIONES ====================
+
+    @Operation(summary = "Añadir contribución a meta")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Contribución creada"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "404", description = "Meta o cuenta no encontrada")
+    })
+    @PostMapping("/{id}/contributions")
+    public ResponseEntity<TransactionResource> contributeToGoal(
+            @PathVariable Long id,
+            @Valid @RequestBody ContributeToGoalResource resource,
+            Authentication authentication) {
+        Long userId = authenticationHelper.getUserIdFromAuthentication(authentication);
+        var command = new ContributeToGoalCommand(
+                userId,
+                id,
+                resource.accountId(),
+                resource.amount(),
+                resource.description()
+        );
+        var transaction = goalCommandService.handle(command);
+        if (transaction.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        var transactionResource = TransactionResourceFromEntityAssembler.toResourceFromEntity(transaction.get());
+        return new ResponseEntity<>(transactionResource, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Obtener contribuciones de una meta")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contribuciones encontradas"),
+            @ApiResponse(responseCode = "404", description = "Meta no encontrada")
+    })
+    @GetMapping("/{id}/contributions")
+    public ResponseEntity<List<TransactionResource>> getGoalContributions(@PathVariable Long id) {
+        var contributions = goalCommandService.getGoalContributions(id);
+        var resources = contributions.stream()
+                .map(TransactionResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(resources);
+    }
+
+    @Operation(summary = "Revertir contribución de una meta")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contribución revertida"),
+            @ApiResponse(responseCode = "404", description = "Meta o transacción no encontrada")
+    })
+    @DeleteMapping("/{id}/contributions/{transactionId}")
+    public ResponseEntity<TransactionResource> revertContribution(
+            @PathVariable Long id,
+            @PathVariable Long transactionId,
+            Authentication authentication) {
+        Long userId = authenticationHelper.getUserIdFromAuthentication(authentication);
+        var command = new RevertGoalContributionCommand(userId, id, transactionId);
+        var transaction = goalCommandService.handle(command);
+        if (transaction.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var transactionResource = TransactionResourceFromEntityAssembler.toResourceFromEntity(transaction.get());
+        return ResponseEntity.ok(transactionResource);
     }
 }

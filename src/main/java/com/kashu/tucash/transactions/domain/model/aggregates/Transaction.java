@@ -1,6 +1,7 @@
 package com.kashu.tucash.transactions.domain.model.aggregates;
 
 import com.kashu.tucash.iam.domain.model.aggregates.User;
+import com.kashu.tucash.savings.domain.model.aggregates.Goal;
 import com.kashu.tucash.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import com.kashu.tucash.transactions.domain.model.commands.CreateTransactionCommand;
 import com.kashu.tucash.transactions.domain.model.commands.UpdateTransactionCommand;
@@ -60,6 +61,12 @@ public class Transaction extends AuditableAbstractAggregateRoot<Transaction> {
     @Setter
     @Column(length = 2000)
     private String sharedSplitMetadata;
+
+    // Para contribuciones a metas de ahorro
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "goal_id")
+    @Setter
+    private Goal linkedGoal;
 
     protected Transaction() {}
 
