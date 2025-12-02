@@ -19,7 +19,8 @@ public class TransactionResourceFromEntityAssembler {
                 entity.getTransactionDate(),
                 linkedGoal != null ? linkedGoal.getId() : null,
                 linkedGoal != null ? linkedGoal.getName() : null,
-                entity.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 }

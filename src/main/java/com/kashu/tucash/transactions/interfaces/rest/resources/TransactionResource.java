@@ -17,6 +17,7 @@ public record TransactionResource(
         LocalDate transactionDate,
         Long goalId,
         String goalName,
-        Date createdAt
+        Date createdAt,
+        Date updatedAt
 ) {
 }

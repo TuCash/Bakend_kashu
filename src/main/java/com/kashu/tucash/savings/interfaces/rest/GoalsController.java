@@ -84,6 +84,30 @@ public class GoalsController {
         return new ResponseEntity<>(goalResource, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Actualizar meta (monto objetivo y fecha límite)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Meta actualizada"),
+            @ApiResponse(responseCode = "404", description = "Meta no encontrada")
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<GoalResource> updateGoal(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateGoalResource resource) {
+        var command = new UpdateGoalCommand(
+                id,
+                null, // name no se actualiza
+                null, // description no se actualiza
+                resource.targetAmount(),
+                resource.deadline() != null ? java.time.LocalDate.parse(resource.deadline()) : null
+        );
+        var goal = goalCommandService.handle(command);
+        if (goal.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var goalResource = GoalResourceFromEntityAssembler.toResourceFromEntity(goal.get());
+        return ResponseEntity.ok(goalResource);
+    }
+
     @Operation(summary = "Actualizar progreso de meta")
     @PatchMapping("/{id}/progress")
     public ResponseEntity<GoalResource> updateGoalProgress(

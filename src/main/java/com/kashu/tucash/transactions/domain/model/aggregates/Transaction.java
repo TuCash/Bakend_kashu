@@ -63,7 +63,7 @@ public class Transaction extends AuditableAbstractAggregateRoot<Transaction> {
     private String sharedSplitMetadata;
 
     // Para contribuciones a metas de ahorro
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "goal_id")
     @Setter
     private Goal linkedGoal;
